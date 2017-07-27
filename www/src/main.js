@@ -7,7 +7,7 @@
 var myLib;
 (function (myLib) {
     var Main = (function () {
-        function Main() {
+        function Main(params) {
             this._pRotZVelocity = 0;
             this._pRotXVelocity = 0;
             this._pSpeed = 80;
@@ -16,13 +16,16 @@ var myLib;
             this._keyTop = false;
             this._keyRight = false;
             this._keyBottom = false;
+            Conf.set(params);
             this._stats = new Stats();
             document.getElementById('stats').appendChild(this._stats.domElement);
             var scene = new THREE.Scene();
-            //var width = 960;
-            //var height = 640;
+            //var width:number = 960;
+            //var height:number = 640;
             var width = document.body.clientWidth;
             var height = document.body.clientHeight;
+            console.log(width);
+            console.log(height);
             var fov = 60;
             var aspect = width / height;
             var near = 1;
@@ -34,7 +37,6 @@ var myLib;
             if (renderer == null) {
                 alert('あなたの環境はWebGLは使えません');
             }
-
             renderer.setSize(width, height);
             document.getElementById('main').appendChild(renderer.domElement);
             this._mainNode = new THREE.Group();
@@ -50,17 +52,22 @@ var myLib;
             this._enemies = [];
             this._missiles = [];
             this._initBackground();
-            this._initPlayerAirplane();
+            if (Conf.rich) {
+                this._initPlayerAirplane();
+            }
+            else {
+                this._initPlayerThinAirplane();
+            }
             this._initDummyCubes();
         }
         Main.prototype._initBackground = function () {
             var materials = [
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/px.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/nx.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/py.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/ny.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/pz.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/nz.jpg') })
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'skybox/px.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'skybox/nx.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'skybox/py.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'skybox/ny.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'skybox/pz.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'skybox/nz.jpg') }) // front
             ];
             var mesh = new THREE.Mesh(new THREE.BoxGeometry(200000, 200000, 200000, 7, 7, 7), new THREE.MeshFaceMaterial(materials));
             mesh.scale.x = -1;
@@ -92,13 +99,24 @@ var myLib;
             group.position.set(500, 500, -30000);
             this._scene.add(group);
         };
+        Main.prototype._initPlayerThinAirplane = function () {
+            var geometry = new THREE.BoxGeometry(120, 150, 10);
+            var material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+            var mesh = new THREE.Mesh(geometry, material);
+            //            mesh.rotateX(-90 * Math.PI / 180);
+            this._playerMesh = mesh;
+            this._playerAirplane = new THREE.Object3D();
+            this._playerAirplane.add(mesh);
+            this._playerAirplane.position.set(0, 0, 0);
+            this._scene.add(this._playerAirplane);
+            this._onReady();
+        };
         Main.prototype._initPlayerAirplane = function () {
             var _this = this;
             var loader = new THREE.JSONLoader();
-            loader.load('src/assets/f14_blender/f14.json', function (geometry, materials) { return _this._onLoadBlenderJson(geometry, materials); }, 'src/assets/f14_blender/');
+            loader.load(Conf.assetDirPath + 'f14_blender/f14.json', function (geometry, materials) { return _this._onLoadBlenderJson(geometry, materials); }, Conf.assetDirPath + 'f14_blender/');
         };
         Main.prototype._onLoadBlenderJson = function (geometry, materials) {
-            
             var faceMaterial = new THREE.MeshFaceMaterial(materials);
             var mesh = new THREE.Mesh(geometry, faceMaterial);
             //mesh.position.set( 0,-30,0);
@@ -106,10 +124,12 @@ var myLib;
             mesh.rotateX(-90 * Math.PI / 180);
             this._playerMesh = mesh;
             this._playerAirplane = new THREE.Object3D();
-            //this._playerAirplane.add(mesh);
+            this._playerAirplane.add(mesh);
             this._playerAirplane.position.set(0, 0, 0);
             this._scene.add(this._playerAirplane);
-            this._initEnemyAirplane();
+            if (Conf.rich) {
+                this._initEnemyAirplane();
+            }
             this._onReady();
         };
         Main.prototype._initEnemyAirplane = function () {
@@ -150,7 +170,25 @@ var myLib;
             var _this = this;
             document.addEventListener('keydown', function (e) { return _this.onDocumentKeyDown(e); }, false);
             document.addEventListener('keyup', function (e) { return _this.onDocumentKeyUp(e); }, false);
-            document.addEventListener('click', function (e) { return _this.shotMissile(); }, false);
+            if (Conf.buttonLeft) {
+                Conf.buttonLeft.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'left'); }, false);
+                Conf.buttonLeft.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'left'); }, false);
+            }
+            if (Conf.buttonRight) {
+                Conf.buttonRight.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'right'); }, false);
+                Conf.buttonRight.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'right'); }, false);
+            }
+            if (Conf.buttonTop) {
+                Conf.buttonTop.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'top'); }, false);
+                Conf.buttonTop.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'top'); }, false);
+            }
+            if (Conf.buttonBottom) {
+                Conf.buttonBottom.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'bottom'); }, false);
+                Conf.buttonBottom.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'bottom'); }, false);
+            }
+            if (Conf.buttonCenter) {
+                Conf.buttonCenter.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'center'); }, false);
+            }
             this._tick();
         };
         Main.prototype._tick = function () {
@@ -224,7 +262,31 @@ var myLib;
             }
             return ret;
         };
+        Main.prototype.onButtonMouseDown = function (e, dict) {
+            if (dict == 'left') {
+                this._keyLeft = true;
+            }
+            else if (dict == 'right') {
+                this._keyRight = true;
+            }
+            else if (dict == 'top') {
+                this._keyTop = true;
+            }
+            else if (dict == 'bottom') {
+                this._keyBottom = true;
+            }
+        };
+        Main.prototype.onButtonMouseUp = function (e, dict) {
+            this._keyLeft = false;
+            this._keyTop = false;
+            this._keyRight = false;
+            this._keyBottom = false;
+            if (dict == 'center') {
+                this.shotMissile();
+            }
+        };
         Main.prototype.onDocumentKeyDown = function (e) {
+            //console.log('keyDown=' + e.keyCode);
             switch (e.keyCode) {
                 case 37:
                     this._keyLeft = true;
@@ -241,6 +303,7 @@ var myLib;
             }
         };
         Main.prototype.onDocumentKeyUp = function (e) {
+            //console.log('keyUp=' + e.keyCode);
             switch (e.keyCode) {
                 case 37:
                     this._keyLeft = false;
@@ -260,7 +323,7 @@ var myLib;
             }
         };
         return Main;
-    })();
+    }());
     myLib.Main = Main;
     var EnemyAirplane = (function () {
         function EnemyAirplane(mesh) {
@@ -302,7 +365,7 @@ var myLib;
             this._node.position.z += moveVector.z;
         };
         return EnemyAirplane;
-    })();
+    }());
     myLib.EnemyAirplane = EnemyAirplane;
     var Missile = (function () {
         function Missile(speed) {
@@ -321,7 +384,7 @@ var myLib;
                 geometry.vertices.push(new THREE.Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
                 this._pool.add(i);
             }
-            var texture = THREE.ImageUtils.loadTexture('src/images/particle1.png');
+            var texture = THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'particle1.png');
             /*
             var material = new THREE.PointCloudMaterial({
                 size: 20, color: 0x111111, blending: THREE.AdditiveBlending,
@@ -377,6 +440,9 @@ var myLib;
                 var target = p.target;
                 //                this._emitterPos.y += 0.1;
                 this._particleGeometry.vertices[target] = p.position;
+                //     this._rot += 0.2;
+                //     this._emitterPos.z = 20 * Math.cos(this._rot * Math.PI / 180);
+                //     this._emitterPos.y = 20 * Math.sin(this._rot * Math.PI / 180);
             }
         };
         Missile.prototype._sparksOnParticleDead = function (particle) {
@@ -388,6 +454,7 @@ var myLib;
                     this._pool.add(particle.target);
                 }
                 else {
+                    //もう再利用は打ち止め
                 }
                 //追加がなくなったあと、すべてがdeadしたら
                 if (this._activeCount <= 0) {
@@ -420,8 +487,43 @@ var myLib;
             }
         };
         return Missile;
-    })();
+    }());
     myLib.Missile = Missile;
+    var Conf = (function () {
+        function Conf() {
+        }
+        Conf.set = function (params) {
+            if (params.hasOwnProperty('assetDirPath')) {
+                Conf.assetDirPath = params.assetDirPath;
+            }
+            if (params.hasOwnProperty('rich')) {
+                Conf.rich = params.rich;
+            }
+            if (params.hasOwnProperty('buttonLeft')) {
+                Conf.buttonLeft = params.buttonLeft;
+            }
+            if (params.hasOwnProperty('buttonRight')) {
+                Conf.buttonRight = params.buttonRight;
+            }
+            if (params.hasOwnProperty('buttonTop')) {
+                Conf.buttonTop = params.buttonTop;
+            }
+            if (params.hasOwnProperty('buttonBottom')) {
+                Conf.buttonBottom = params.buttonBottom;
+            }
+            if (params.hasOwnProperty('buttonCenter')) {
+                Conf.buttonCenter = params.buttonCenter;
+            }
+        };
+        return Conf;
+    }());
+    Conf.assetDirPath = null;
+    Conf.rich = true;
+    Conf.buttonLeft = null;
+    Conf.buttonRight = null;
+    Conf.buttonTop = null;
+    Conf.buttonBottom = null;
+    Conf.buttonCenter = null;
     var ExplodeParticle = (function () {
         function ExplodeParticle(x, y, z) {
             var _this = this;
@@ -437,7 +539,7 @@ var myLib;
                 geometry.vertices.push(new THREE.Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
                 this._pool.add(i);
             }
-            var texture = THREE.ImageUtils.loadTexture('src/images/particle1.png');
+            var texture = THREE.ImageUtils.loadTexture(Conf.assetDirPath + 'particle1.png');
             //            var material = new THREE.PointCloudMaterial({
             //                size: 20, color: 0x993300, blending: THREE.AdditiveBlending,
             //                transparent: true, depthTest: false, map: texture , sizeAttenuation:false });
@@ -529,14 +631,14 @@ var myLib;
             }
         };
         return ExplodeParticle;
-    })();
+    }());
     var ParticleAttributes = (function () {
         function ParticleAttributes() {
             this.size = new ParticleAttributesParams('f', []);
             this.pcolor = new ParticleAttributesParams('c', []);
         }
         return ParticleAttributes;
-    })();
+    }());
     var ParticleAttributesParams = (function () {
         function ParticleAttributesParams(t, v) {
             this.type = '';
@@ -546,7 +648,7 @@ var myLib;
             this.value = v;
         }
         return ParticleAttributesParams;
-    })();
+    }());
     var Pool = (function () {
         function Pool() {
             this.__pools = [];
@@ -564,9 +666,5 @@ var myLib;
             this.__pools = [];
         };
         return Pool;
-    })();
+    }());
 })(myLib || (myLib = {}));
-window.onload = function () {
-    new myLib.Main();
-};
-//# sourceMappingURL=main007.js.map
