@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
     <script src="components/loader.js"></script>
     <link rel="stylesheet" href="components/loader.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="main.css">
     <script src="libs/stats.min.js"></script>
     <script src="libs/three.js"></script>
     <script src="libs/tween.min.js"></script>
@@ -34,18 +34,26 @@
             gl_FragColor = outColor * vec4( vColor, 1.0 );
         }
     </script>
+    <script type="text/javascript">
 
-    <style>
-        *{
-            margin: 0;
+        function start(){
+            document.getElementById('prepare').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+
+            var params = {
+                'assetDirPath':'src/assets/'
+                ,'rich':false
+                ,'buttonLeft':document.getElementById('btnForMobileLeft')
+                ,'buttonRight':document.getElementById('btnForMobileRight')
+                ,'buttonTop':document.getElementById('btnForMobileTop')
+                ,'buttonBottom':document.getElementById('btnForMobileBottom')
+                ,'buttonCenter':document.getElementById('btnForMobileCenter')
+            };
+            new myLib.Main(params);
         }
-        #stats{
-            position: absolute;
-        }
-        #main{
-            position: absolute;
-        }
-    </style>
+
+    </script>
+
 
 </head>
 <body>

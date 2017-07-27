@@ -171,23 +171,23 @@ var myLib;
             document.addEventListener('keydown', function (e) { return _this.onDocumentKeyDown(e); }, false);
             document.addEventListener('keyup', function (e) { return _this.onDocumentKeyUp(e); }, false);
             if (Conf.buttonLeft) {
-                Conf.buttonLeft.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'left'); }, false);
-                Conf.buttonLeft.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'left'); }, false);
+                Conf.buttonLeft.addEventListener('touchstart', function (e) { return _this.onButtonMouseDown(e, 'left'); }, false);
+                Conf.buttonLeft.addEventListener('touchend', function (e) { return _this.onButtonMouseUp(e, 'left'); }, false);
             }
             if (Conf.buttonRight) {
-                Conf.buttonRight.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'right'); }, false);
-                Conf.buttonRight.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'right'); }, false);
+                Conf.buttonRight.addEventListener('touchstart', function (e) { return _this.onButtonMouseDown(e, 'right'); }, false);
+                Conf.buttonRight.addEventListener('touchend', function (e) { return _this.onButtonMouseUp(e, 'right'); }, false);
             }
             if (Conf.buttonTop) {
-                Conf.buttonTop.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'top'); }, false);
-                Conf.buttonTop.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'top'); }, false);
+                Conf.buttonTop.addEventListener('touchstart', function (e) { return _this.onButtonMouseDown(e, 'top'); }, false);
+                Conf.buttonTop.addEventListener('touchend', function (e) { return _this.onButtonMouseUp(e, 'top'); }, false);
             }
             if (Conf.buttonBottom) {
-                Conf.buttonBottom.addEventListener('mousedown', function (e) { return _this.onButtonMouseDown(e, 'bottom'); }, false);
-                Conf.buttonBottom.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'bottom'); }, false);
+                Conf.buttonBottom.addEventListener('touchstart', function (e) { return _this.onButtonMouseDown(e, 'bottom'); }, false);
+                Conf.buttonBottom.addEventListener('touchend', function (e) { return _this.onButtonMouseUp(e, 'bottom'); }, false);
             }
             if (Conf.buttonCenter) {
-                Conf.buttonCenter.addEventListener('mouseup', function (e) { return _this.onButtonMouseUp(e, 'center'); }, false);
+                Conf.buttonCenter.addEventListener('touchend', function (e) { return _this.onButtonMouseUp(e, 'center'); }, false);
             }
             this._tick();
         };
