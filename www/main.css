@@ -1,5 +1,12 @@
 *{
     margin: 0;
+    touch-callout:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+/*
+pointer-events: none;
+*/
 }
 
 html,body{
@@ -7,11 +14,6 @@ html,body{
     height: 99%;
 }
 
-*{
-  -webkit-touch-callout:none; // リンク長押しのポップアップを無効化
-  -webkit-user-select:none; // テキスト長押しの選択ボックスを無効化
-  pointer-events: none;
-}
 
 #stats{
     position: absolute;

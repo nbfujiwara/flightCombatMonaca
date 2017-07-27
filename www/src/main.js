@@ -100,7 +100,7 @@ var myLib;
             this._scene.add(group);
         };
         Main.prototype._initPlayerThinAirplane = function () {
-            var geometry = new THREE.BoxGeometry(120, 150, 10);
+            var geometry = new THREE.BoxGeometry(120, 100, 10);
             var material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
             var mesh = new THREE.Mesh(geometry, material);
             //            mesh.rotateX(-90 * Math.PI / 180);
@@ -210,7 +210,7 @@ var myLib;
             //機体の回転
             this._playerAirplane.quaternion.copy(this._pQuaternion);
             //カメラの追随
-            var cameraDiffVector = new THREE.Vector3(0, 30, 200); //機体からどれだけカメラをずらして追随させるか
+            var cameraDiffVector = new THREE.Vector3(0, 50, 200); //機体からどれだけカメラをずらして追随させるか
             //            var cameraVector:THREE.Vector3 = this._pQuaternion.multiplyVector3(cameraDiffVector); //←動作するけど近々削除されそうらしいので↓に変更
             var cameraVector = cameraDiffVector.applyQuaternion(this._pQuaternion);
             cameraVector.x += this._playerAirplane.position.x;
