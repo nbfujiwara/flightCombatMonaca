@@ -19,8 +19,10 @@ var myLib;
             this._stats = new Stats();
             document.getElementById('stats').appendChild(this._stats.domElement);
             var scene = new THREE.Scene();
-            var width = 960;
-            var height = 640;
+            //var width = 960;
+            //var height = 640;
+            var width = document.body.clientWidth;
+            var height = document.body.clientHeight;
             var fov = 60;
             var aspect = width / height;
             var near = 1;
@@ -32,6 +34,7 @@ var myLib;
             if (renderer == null) {
                 alert('あなたの環境はWebGLは使えません');
             }
+
             renderer.setSize(width, height);
             document.getElementById('main').appendChild(renderer.domElement);
             this._mainNode = new THREE.Group();
@@ -52,12 +55,12 @@ var myLib;
         }
         Main.prototype._initBackground = function () {
             var materials = [
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('assets/skybox/px.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('assets/skybox/nx.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('assets/skybox/py.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('assets/skybox/ny.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('assets/skybox/pz.jpg') }),
-                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('assets/skybox/nz.jpg') })
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/px.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/nx.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/py.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/ny.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/pz.jpg') }),
+                new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('src/assets/skybox/nz.jpg') })
             ];
             var mesh = new THREE.Mesh(new THREE.BoxGeometry(200000, 200000, 200000, 7, 7, 7), new THREE.MeshFaceMaterial(materials));
             mesh.scale.x = -1;
@@ -92,9 +95,10 @@ var myLib;
         Main.prototype._initPlayerAirplane = function () {
             var _this = this;
             var loader = new THREE.JSONLoader();
-            loader.load('assets/f14_blender/f14.json', function (geometry, materials) { return _this._onLoadBlenderJson(geometry, materials); }, 'assets/f14_blender/');
+            loader.load('src/assets/f14_blender/f14.json', function (geometry, materials) { return _this._onLoadBlenderJson(geometry, materials); }, 'src/assets/f14_blender/');
         };
         Main.prototype._onLoadBlenderJson = function (geometry, materials) {
+            
             var faceMaterial = new THREE.MeshFaceMaterial(materials);
             var mesh = new THREE.Mesh(geometry, faceMaterial);
             //mesh.position.set( 0,-30,0);
@@ -102,7 +106,7 @@ var myLib;
             mesh.rotateX(-90 * Math.PI / 180);
             this._playerMesh = mesh;
             this._playerAirplane = new THREE.Object3D();
-            this._playerAirplane.add(mesh);
+            //this._playerAirplane.add(mesh);
             this._playerAirplane.position.set(0, 0, 0);
             this._scene.add(this._playerAirplane);
             this._initEnemyAirplane();
@@ -146,6 +150,7 @@ var myLib;
             var _this = this;
             document.addEventListener('keydown', function (e) { return _this.onDocumentKeyDown(e); }, false);
             document.addEventListener('keyup', function (e) { return _this.onDocumentKeyUp(e); }, false);
+            document.addEventListener('click', function (e) { return _this.shotMissile(); }, false);
             this._tick();
         };
         Main.prototype._tick = function () {
@@ -316,7 +321,7 @@ var myLib;
                 geometry.vertices.push(new THREE.Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
                 this._pool.add(i);
             }
-            var texture = THREE.ImageUtils.loadTexture('images/particle1.png');
+            var texture = THREE.ImageUtils.loadTexture('src/images/particle1.png');
             /*
             var material = new THREE.PointCloudMaterial({
                 size: 20, color: 0x111111, blending: THREE.AdditiveBlending,
@@ -432,7 +437,7 @@ var myLib;
                 geometry.vertices.push(new THREE.Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
                 this._pool.add(i);
             }
-            var texture = THREE.ImageUtils.loadTexture('images/particle1.png');
+            var texture = THREE.ImageUtils.loadTexture('src/images/particle1.png');
             //            var material = new THREE.PointCloudMaterial({
             //                size: 20, color: 0x993300, blending: THREE.AdditiveBlending,
             //                transparent: true, depthTest: false, map: texture , sizeAttenuation:false });
